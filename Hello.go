@@ -76,6 +76,15 @@ func main() {
 	var chg1, chg2 = 1, 2
 	swap(&chg1, &chg2)
 	fmt.Printf("after change %d, %d", chg1, chg2)
+
+	var c1 Circle
+	c1.radius = 10.00
+	fmt.Println("All you need is real man ", CalCircle(c1))
+
+}
+
+func CalCircle(a Circle) float64 {
+	return 3.14 * a.radius * a.radius
 }
 
 func GoGo() (int, int) {
@@ -86,4 +95,8 @@ func swap(a *int, b *int) {
 	temp := *a
 	*a = *b
 	*b = temp
+}
+
+type Circle struct {
+	radius float64
 }
