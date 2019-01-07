@@ -81,6 +81,9 @@ func main() {
 	c1.radius = 10.00
 	fmt.Println("All you need is real man ", CalCircle(c1))
 
+	p := Brother()
+	fmt.Println("Is that yours:", p())
+	fmt.Println("Is that yours:", p())
 }
 
 func CalCircle(a Circle) float64 {
@@ -99,4 +102,12 @@ func swap(a *int, b *int) {
 
 type Circle struct {
 	radius float64
+}
+
+func Brother() func() int {
+	i := 0
+	return func() int {
+		i++
+		return i
+	}
 }
