@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 	"unsafe"
 )
 
@@ -33,8 +34,34 @@ const (
 	Test4
 )
 
+type DivideError struct {
+	divideDee int
+	divideDer int
+}
+
+func (de *DivideError) Error() string {
+	stringFormat := `Cannot proceed, the divider is zero.
+    dividee: %d
+	divider: 0
+	`
+	return fmt.Sprintf(stringFormat, de.divideDee)
+}
+
+func Divide(numerator int, denominator int) (result int, errorMsg string) {
+	if denominator == 0 {
+		errData := DivideError{
+			divideDee: numerator,
+			divideDer: denominator,
+		}
+		errorMsg = errData.Error()
+		return
+	} else {
+		return numerator / denominator, ""
+	}
+}
+
 func main() {
-	var x interface{}
+	//var x interface{}
 
 	b, c, d := 'a', 'b', 'c'
 	_, f := 'd', 'e'
@@ -52,11 +79,11 @@ func main() {
 
 	println(Test1, Test2, Test3, Test4)
 
-	switch x.(type) {
-	case nil:
-		println("x 是 nil 型")
-		break
-	}
+	// switch x.(type) {
+	// case nil:
+	// 	println("x 是 nil 型")
+	// 	break
+	// }
 
 	// var c1, c2, c3 chan int
 	// var i1, i2 int
@@ -79,11 +106,66 @@ func main() {
 
 	var c1 Circle
 	c1.radius = 10.00
-	fmt.Println("All you need is real man ", CalCircle(c1))
+	fmt.Println("All you need is real ", CalCircle(c1))
 
 	p := Brother()
 	fmt.Println("Is that yours:", p())
 	fmt.Println("Is that yours:", p())
+
+	var arr = []float32{1.0, 2.0, 3.0, 4.5}
+	// this like foreach
+	for index, value := range arr {
+		fmt.Println("the value is ", index, value)
+	}
+
+	//leizhou := Person{ name="leizhou", age }
+
+	v1 := []int{1, 2, 3}
+
+	fmt.Println("know you", v1[1:])
+
+	country := map[string]string{"China": "Beijing", "Japan": "Tokyo", "USA": "WashionDon D.C"}
+	//country = make(map[string]string)
+
+	//country["China"] = "Beijing"
+	delete(country, "Japan")
+	for _, item := range country {
+		fmt.Println(item, country[item])
+	}
+	mon := new(GoldenMonkey)
+	mon.name()
+
+	if _, msg := Divide(3, 1); msg != "" {
+		fmt.Println(msg)
+	}
+
+	go say("周")
+	say("磊")
+
+	s := []int{7, 2, 8, -9, 4, 0}
+	channel := make(chan int)
+	go sum(s[:len(s)/2], channel)
+	go sum(s[len(s)/2:], channel)
+	x, y := <-channel, <-channel
+	fmt.Println(x, y, x+y)
+
+	ch := make(chan int, 2)
+
+	// 因为 ch 是带缓冲的通道，我们可以同时发送两个数据
+	// 而不用立刻需要去同步读取数据
+	ch <- 1
+	ch <- 2
+	//ch <- 3
+	// 获取这两个数据
+	fmt.Println(<-ch)
+	fmt.Println(<-ch)
+}
+
+func say(s string) {
+	for i := 0; i < 5; i++ {
+		time.Sleep(100 * time.Microsecond)
+		fmt.Println(s)
+	}
 }
 
 func CalCircle(a Circle) float64 {
@@ -104,10 +186,36 @@ type Circle struct {
 	radius float64
 }
 
+type Person struct {
+	name   string
+	age    int
+	Height float32
+}
+
+type Monkey interface {
+	kind()
+	name()
+}
+
+type GoldenMonkey struct {
+}
+
+func (monkey GoldenMonkey) name() {
+	fmt.Println("I'm a monkey")
+}
+
 func Brother() func() int {
 	i := 0
 	return func() int {
 		i++
 		return i
 	}
+}
+
+func sum(arr []int, channel chan int) {
+	sum := 0
+	for index := 0; index < len(arr); index++ {
+		sum += arr[index]
+	}
+	channel <- sum
 }
