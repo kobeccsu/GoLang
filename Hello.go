@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"math"
+	"math/rand"
+	"net/http"
 	"time"
 	"unsafe"
 )
@@ -159,6 +163,48 @@ func main() {
 	// 获取这两个数据
 	fmt.Println(<-ch)
 	fmt.Println(<-ch)
+
+	rand.Seed(100)
+	fmt.Println("random :", rand.Intn(100))
+	for index := 0; index < len(s); index++ {
+		fmt.Println("use for ", s[index])
+	}
+	fmt.Println("math :", math.Pi)
+
+	today := time.Now().Weekday()
+	switch time.Saturday {
+	case today + 0:
+		fmt.Println("To")
+		break
+	case today + 1:
+		fmt.Println("one day later")
+		break
+	default:
+		fmt.Println("too far")
+	}
+
+	defer fmt.Println("I appear later")
+	fmt.Println("I'm showing right now")
+	res, err := http.Get("https://kyfw.12306.cn/passport/captcha/captcha-image64?login_site=E&module=login&rand=sjrand&1553139749524&callback=jQuery19106227248862412864_1553139737622&_json_att=&_=1553139737624")
+	if err != nil {
+		fmt.Println("error happend", err)
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	//var data ImageJson
+	//json.Unmarshal(body, &data)
+	fmt.Printf("Results: %v\n", string(body))
+}
+
+type ImageJson struct {
+	Image         string
+	ResultCode    string
+	ResultMessage string
 }
 
 func say(s string) {
